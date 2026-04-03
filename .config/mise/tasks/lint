@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#MISE description="Run all linters"
+#MISE sources=["**/*.go", ".config/golangci.yml"]
+set -euo pipefail
+golangci-lint run -c .config/golangci.yml
+dprint check -c .config/dprint.json

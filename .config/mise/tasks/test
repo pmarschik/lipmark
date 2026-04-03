@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#MISE description="Run tests"
+#MISE sources=["**/*.go", "go.mod"]
+set -euo pipefail
+go test ./...

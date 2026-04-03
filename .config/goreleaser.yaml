@@ -1,0 +1,15 @@
+version: 2
+project_name: lipmark
+
+# Library — skip binary builds entirely.
+builds:
+  - skip: true
+
+release:
+  github:
+    owner: pmarschik
+    name: lipmark
+  prerelease: auto
+
+changelog:
+  disable: true

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#MISE description="Format all files"
+#MISE alias="f"
+#MISE sources=["**/*.go", ".config/golangci.yml"]
+set -euo pipefail
+golangci-lint run --fix -c .config/golangci.yml
+dprint fmt -c .config/dprint.json

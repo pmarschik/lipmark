@@ -1,0 +1,16 @@
+# :schema https://mise.jdx.dev/schema/mise.json
+[tools]
+hk = "latest"
+git-cliff = "latest"
+typos = "latest"
+go = "latest"
+golangci-lint = "2"
+goreleaser = "latest"
+dprint = "latest"
+cocogitto = "latest"
+
+[env]
+HK_FILE = ".config/hk.pkl"
+HK_MISE = "1"
+
+# Tasks are file-based in .config/mise/tasks/

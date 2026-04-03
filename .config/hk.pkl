@@ -1,0 +1,43 @@
+amends "package://github.com/jdx/hk/releases/download/v1.38.0/hk@1.38.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v1.38.0/hk@1.38.0#/Builtins.pkl"
+
+local formatters = new Mapping<String, Step> {
+    ["go_fmt"] = Builtins.go_fmt
+    ["dprint"] { fix = "dprint fmt -c .config/dprint.json"; check = "dprint check -c .config/dprint.json" }
+}
+local linters = new Mapping<String, Step> {
+    ["golangci_lint"] { fix = "golangci-lint run --fix -c .config/golangci.yml"; check = "golangci-lint run -c .config/golangci.yml" }
+    ["typos"] { fix = "typos -w"; check = "typos" }
+}
+local checkers = new Mapping<String, Step> {
+    ["go_vet"] = Builtins.go_vet
+    ["gomod_tidy"] = Builtins.gomod_tidy
+}
+local all_steps = new Mapping<String, Step> {
+    ["go_fmt"] = Builtins.go_fmt
+    ["dprint"] { fix = "dprint fmt -c .config/dprint.json"; check = "dprint check -c .config/dprint.json" }
+    ["golangci_lint"] { fix = "golangci-lint run --fix -c .config/golangci.yml"; check = "golangci-lint run -c .config/golangci.yml" }
+    ["typos"] { fix = "typos -w"; check = "typos" }
+    ["go_vet"] = Builtins.go_vet
+    ["gomod_tidy"] = Builtins.gomod_tidy
+}
+local fix_steps = new Mapping<String, Step> {
+    ["go_fmt"] = Builtins.go_fmt
+    ["dprint"] { fix = "dprint fmt -c .config/dprint.json"; check = "dprint check -c .config/dprint.json" }
+    ["golangci_lint"] { fix = "golangci-lint run --fix -c .config/golangci.yml"; check = "golangci-lint run -c .config/golangci.yml" }
+    ["typos"] { fix = "typos -w"; check = "typos" }
+}
+local lint_steps = new Mapping<String, Step> {
+    ["golangci_lint"] { fix = "golangci-lint run --fix -c .config/golangci.yml"; check = "golangci-lint run -c .config/golangci.yml" }
+    ["typos"] { fix = "typos -w"; check = "typos" }
+    ["go_vet"] = Builtins.go_vet
+    ["gomod_tidy"] = Builtins.gomod_tidy
+}
+hooks {
+    ["pre-commit"] { fix = true; stash = "git"; steps = all_steps }
+    ["pre-push"] { steps = all_steps }
+    ["fmt"] { fix = true; steps = formatters }
+    ["lint"] { steps = lint_steps }
+    ["fix"] { fix = true; steps = fix_steps }
+    ["check"] { steps = all_steps }
+}

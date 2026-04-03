@@ -1,0 +1,6 @@
+# Conventional commit scopes for this project.
+# Update this list as the project grows.
+# Used by agents (via AGENTS.md reference) and optionally by cocogitto for enforcement.
+#
+# Example: scopes = ["api", "cli", "core", "config", "ci", "docs"]
+scopes = ["theme", "glyphs", "markup", "ui", "tinted", "docs"]

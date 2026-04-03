@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="Run all quality gates (format + lint + typos + test)"
+#MISE alias="chk"
+#MISE depends=["fmt", "lint", "typos", "test"]
