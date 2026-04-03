@@ -3,4 +3,4 @@
 # Used by agents (via AGENTS.md reference) and optionally by cocogitto for enforcement.
 #
 # Example: scopes = ["api", "cli", "core", "config", "ci", "docs"]
-scopes = ["theme", "glyphs", "markup", "ui", "tinted", "docs"]
+scopes = ["theme", "glyphs", "markup", "ui", "release", "tinted", "docs", "ci"]

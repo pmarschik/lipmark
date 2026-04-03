@@ -5,6 +5,9 @@ on:
     tags:
       - "v[0-9]+.*"
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
   contents: write
 
@@ -12,17 +15,33 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
 
-      - uses: goreleaser/goreleaser-action@v6
+      - uses: jdx/mise-action@v4
+        with:
+          install_args: git-cliff goreleaser
+
+      - name: Generate release notes
+        run: |
+          release_notes_file="${RUNNER_TEMP}/lipmark-release-notes.md"
+          mise exec -- git-cliff --config .config/cliff.toml --latest > "${release_notes_file}"
+
+          test -s "${release_notes_file}" || {
+            echo "failed to generate release notes with git-cliff" >&2
+            exit 1
+          }
+
+          echo "RELEASE_NOTES_FILE=${release_notes_file}" >> "${GITHUB_ENV}"
+
+      - uses: goreleaser/goreleaser-action@v7
         with:
           version: "~> v2"
-          args: release --config .config/goreleaser.yaml --release-notes CHANGELOG.md --clean
+          args: release --config .config/goreleaser.yaml --release-notes "${{ env.RELEASE_NOTES_FILE }}" --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

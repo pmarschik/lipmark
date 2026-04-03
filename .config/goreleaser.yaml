@@ -10,6 +10,3 @@ release:
     owner: pmarschik
     name: lipmark
   prerelease: auto
-
-changelog:
-  disable: true
