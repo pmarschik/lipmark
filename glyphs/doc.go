@@ -48,4 +48,10 @@
 // [AutoMode] inspects environment variables (NERD_FONT, POWERLINE_*,
 // TERM_PROGRAM, locale) to pick the best mode for the current terminal.
 // Pass "auto" to [Registry.Resolve] or [Registry.ResolveInto] to use it.
+//
+// # Preview
+//
+// Use [PreviewLine] for compact single-line listings of glyph sets. Pass the
+// available width to bound the output. Use [Preview] for a longer, named
+// preview of one glyph set.
 package glyphs

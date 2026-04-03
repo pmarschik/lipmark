@@ -55,4 +55,9 @@
 // [LoadDefs] and [LoadDefsFile] parse YAML files into style definition maps
 // that can be registered on a preset. [MergeDefs] overlays partial
 // definitions onto a base map.
+//
+// # Preview
+//
+// Use [PreviewLine] for compact single-line listings of themes, and [Preview]
+// or [PreviewCompare] for detailed inspection of a specific theme.
 package theme

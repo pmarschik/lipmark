@@ -91,9 +91,9 @@ ui.StyledGlyph("success")    // styled glyph: "\033[32m✓\033[0m"
 ui.Style("heading")          // lipgloss.Style for manual use
 ```
 
-### Theme Preview
+### Combined Preview
 
-Render a sample showing all theme styles:
+Render both sections together:
 
 ```go
 lipmark.Preview(os.Stdout, glyphSet, themeSet)
@@ -156,6 +156,35 @@ defs, _ := theme.LoadDefsFile("theme.yaml")
 merged := theme.MergeDefs(base, overlay)  // partial override
 ```
 
+### Preview
+
+For listing many themes, use the single-line preview:
+
+```go
+theme.PreviewLine(styles, 32)
+```
+
+For a detailed view of one theme:
+
+```go
+theme.Preview(os.Stdout, styles)
+theme.PreviewCompare(os.Stdout, "default", defaultStyles, "dracula", draculaStyles)
+```
+
+You can extend the detailed preview with your own style samples:
+
+```go
+theme.Preview(
+    os.Stdout,
+    styles,
+    theme.WithPreviewSection(
+        "Custom:",
+        theme.PreviewItem{Style: "issue_key", Text: "PROJ-123"},
+        theme.PreviewItem{Style: "repo", Text: "lipmark"},
+    ),
+)
+```
+
 ### Custom NO_COLOR
 
 ```go
@@ -205,6 +234,20 @@ reg.ResolveInto("auto", &g)
 | **ascii**   | Non-UTF-8 or explicit          | [ok] [err] [warn] -> \* |
 | **nerd**    | NERD_FONT env var              | Nerd Font icons         |
 | **emoji**   | Modern terminal apps           | ✅ ❌ ⚠️ ➡️ ⭐            |
+
+### Preview
+
+For listing many glyph modes or sets, use the single-line preview and pass an available width:
+
+```go
+glyphs.PreviewLine(set, 32)
+```
+
+For a detailed view of one glyph set:
+
+```go
+glyphs.Preview(os.Stdout, set)
+```
 
 ## Tinted Themes
 
@@ -297,15 +340,17 @@ styles.Get(tinted.Base08) // red style
 lipmark/
   markup.go         # Render() — {placeholder} markup processor
   ui.go             # UI type — themed output with markup
-  preview.go        # Preview() — theme sample rendering
+  preview.go        # Preview() — combined top-level preview wrapper
   theme/
     theme.go        # Registry, BaseStyles, BaseStyleDefs, StyleDef
+    preview.go      # PreviewLine(), Preview(), PreviewCompare()
     tinted/
       tinted.go     # Palette, PaletteDefs, Mapping, constants
       embedded/     # 5 pre-generated schemes, WithEmbedded()
       load/         # YAML loading (separate dependency)
   glyphs/
     glyphs.go       # Registry, BaseGlyphs, 34 icons x 4 modes
+    preview.go      # PreviewLine(), Preview()
   cmd/
     lipmark-tinted/ # Code generator + scheme fetcher
 ```
