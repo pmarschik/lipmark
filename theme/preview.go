@@ -27,6 +27,43 @@ type previewConfig struct {
 	sections []PreviewSection
 }
 
+// PreviewLineMode controls how PreviewLine renders each style segment.
+type PreviewLineMode int
+
+const (
+	PreviewLineText     PreviewLineMode = iota // styled text labels (default)
+	PreviewLineSwatches                        // solid █ blocks
+)
+
+// PreviewLineOption customizes PreviewLine rendering.
+type PreviewLineOption func(*previewLineConfig)
+
+type previewLineConfig struct {
+	extraStyles []string
+	mode        PreviewLineMode
+}
+
+// WithPreviewLineMode sets the rendering mode for PreviewLine.
+func WithPreviewLineMode(mode PreviewLineMode) PreviewLineOption {
+	return func(cfg *previewLineConfig) {
+		cfg.mode = mode
+	}
+}
+
+// WithSwatchStyles appends extra style names to the swatch band.
+// Extra styles are appended after the default color-bearing built-ins.
+// Has no effect in PreviewLineText mode.
+func WithSwatchStyles(names ...string) PreviewLineOption {
+	return func(cfg *previewLineConfig) {
+		cfg.extraStyles = append(cfg.extraStyles, names...)
+	}
+}
+
+var defaultSwatchStyles = []string{
+	Success, Error, Warning, Info, Muted,
+	Command, Flag, Heading, Key, Value, Path,
+}
+
 var previewLineSegments = []struct {
 	style string
 	text  string
@@ -88,7 +125,16 @@ func WithPreviewSection(title string, items ...PreviewItem) PreviewOption {
 
 // PreviewLine renders a short single-line style preview.
 // If width is > 0, the output is bounded to the given display width.
-func PreviewLine(set Set, width int) string {
+// Optional PreviewLineOption values customize rendering (e.g. swatch mode).
+func PreviewLine(set Set, width int, opts ...PreviewLineOption) string {
+	cfg := &previewLineConfig{}
+	for _, opt := range opts {
+		opt(cfg)
+	}
+	if cfg.mode == PreviewLineSwatches {
+		return renderSwatchLine(set, width, cfg.extraStyles)
+	}
+
 	parts := make([]string, 0, len(previewLineSegments))
 	currentWidth := 0
 
@@ -105,6 +151,7 @@ func PreviewLine(set Set, width int) string {
 		parts = append(parts, rendered)
 		currentWidth += partWidth
 	}
+
 	return strings.Join(parts, " ")
 }
 
@@ -112,7 +159,7 @@ func PreviewLine(set Set, width int) string {
 func Preview(w io.Writer, set Set, opts ...PreviewOption) {
 	fmt.Fprintln(w, set.Get(Heading).Render("Theme Preview"))
 	fmt.Fprintln(w)
-	fmt.Fprintln(w, "  "+PreviewLine(set, 0))
+	fmt.Fprintln(w, "  "+PreviewLine(set, 0, WithPreviewLineMode(PreviewLineSwatches)))
 	fmt.Fprintln(w)
 
 	cfg := previewConfig{
@@ -150,6 +197,26 @@ func PreviewCompare(w io.Writer, name1 string, set1 Set, name2 string, set2 Set)
 		right := set2.Get(pair.style).Render(pair.label)
 		fmt.Fprintf(w, "  %-28s   %s\n", left, right)
 	}
+}
+
+func renderSwatchLine(set Set, width int, extraStyles []string) string {
+	styles := make([]string, 0, len(defaultSwatchStyles)+len(extraStyles))
+	styles = append(styles, defaultSwatchStyles...)
+	styles = append(styles, extraStyles...)
+	var sb strings.Builder
+	count := 0
+	for _, name := range styles {
+		style := set.Get(name)
+		if _, ok := style.GetForeground().(lipgloss.NoColor); ok {
+			continue
+		}
+		if width > 0 && count >= width {
+			break
+		}
+		sb.WriteString(style.Render("█"))
+		count++
+	}
+	return sb.String()
 }
 
 func renderPreviewSections(w io.Writer, set Set, sections []PreviewSection) {
